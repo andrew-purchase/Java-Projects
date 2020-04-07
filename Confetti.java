@@ -1,8 +1,13 @@
 package application;
 
 import javafx.scene.shape.*;
+import javafx.scene.text.Text;
+
+import java.awt.Font;
+import java.awt.Label;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
+import java.awt.TextField;
 import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -12,20 +17,27 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class Confetti extends Application {
+	int pressCount = 0;
 	@Override
 	public void start(Stage stage){
 			
 		//starting things
 		int MaxX = 1000; int MaxY = 800;
+		
 		Pane canvas = new Pane();
 		canvas.resize(MaxX, MaxY);
 		Scene scene = new Scene(canvas, MaxX, MaxY, Color.BLACK);
+		
+		Text score = new Text(1000, 450, "" + pressCount);
+		score.setFill(Color.SNOW);
+		canvas.getChildren().add(score);
 		
         stage.setTitle("Piñata");
         stage.setScene(scene);
@@ -38,7 +50,7 @@ public class Confetti extends Application {
 		canvas.getChildren().add(pinata);
 		
 		//when mouse clicked
-	    scene.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+	    scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {		
 							
@@ -47,8 +59,7 @@ public class Confetti extends Application {
 				java.awt.Point here = pointer.getLocation();
 				int mouseX = (int) here.getX();
 				int mouseY = (int) here.getY(); 
-				System.out.println("x\t" + mouseX);
-				System.out.println("y\t" + mouseY);
+				
 				//blast area
 				Rectangle blast = new Rectangle(12, 12, Color.TRANSPARENT);
 				blast.relocate(mouseX - 6, mouseY - 6);
@@ -66,7 +77,7 @@ public class Confetti extends Application {
 					int g = rand.nextInt(256);
 					int b = rand.nextInt(256);
 					Color rainbow = Color.rgb(r, g, b);	
-					
+
 					//make confetti
 					Rectangle confetti = new Rectangle(5, 5, rainbow);
 					confetti.relocate(mouseX, mouseY);
@@ -76,13 +87,19 @@ public class Confetti extends Application {
 					Timeline explode = new Timeline();
 					explode.setCycleCount(0);
 					explode.setAutoReverse(true);
-					explode.getKeyFrames().add(new KeyFrame(Duration.millis(1200),
+					explode.getKeyFrames().add(new KeyFrame(Duration.millis(900),
 							 new KeyValue (confetti.translateXProperty(), rand.nextInt(60) - 30),
 							 new KeyValue (confetti.translateYProperty(), rand.nextInt(60) - 30)));
 					explode.play();
 					//move pinata
 					pinata.relocate(rand.nextInt(MaxX), rand.nextInt(MaxY));
 					}
+					//update score
+				pressCount++;
+				canvas.getChildren().remove(score);
+				score.setText("" + pressCount);
+				score.setFill(Color.SNOW);
+				canvas.getChildren().add(score);
 				}
 			}
 		});
