@@ -1,18 +1,26 @@
 package application;
 
+import java.util.Timer;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
-
+import java.util.TimerTask;
 import java.awt.Font;
 import java.awt.Label;
 import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.TextField;
 import java.util.Random;
+import java.util.TimerTask;
+import java.util.TimerTask;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
@@ -47,8 +55,28 @@ public class Confetti extends Application {
 		Rectangle pinata = new Rectangle(12, 12, Color.CYAN);
 		Random rand = new Random();
 		pinata.relocate(rand.nextInt(MaxX), rand.nextInt(MaxY));
+	
 		canvas.getChildren().add(pinata);
 		
+		//make pinata blink
+		FadeTransition blink = new FadeTransition(Duration.millis(500), pinata);		
+		blink.setFromValue(1.0);
+		blink.setToValue(0.0);
+		blink.setAutoReverse(true);
+		blink.setCycleCount(FadeTransition.INDEFINITE);				
+		blink.play();
+		
+		//make pinata reappear at random lcoations
+		Timeline asfd = new Timeline(new KeyFrame(Duration.seconds(2),
+		        new EventHandler<ActionEvent>() {
+		            public void handle(ActionEvent ae) {
+						pinata.relocate(rand.nextInt(MaxX), rand.nextInt(MaxY));		            	
+		            }
+		        }
+		));
+		asfd.setCycleCount(Animation.INDEFINITE);
+		asfd.play();       
+
 		//when mouse clicked
 	    scene.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
@@ -73,13 +101,25 @@ public class Confetti extends Application {
 					
 					//add random color
 				    Random rand = new Random();
-					int r = rand.nextInt(256);
-					int g = rand.nextInt(256);
-					int b = rand.nextInt(256);
-					Color rainbow = Color.rgb(r, g, b);	
+//					int r = rand.nextInt(256);
+//					int g = rand.nextInt(256);
+//					int b = rand.nextInt(256);
+//					Color rainbow = Color.rgb(r, g, b);	
+					
+					//green		
+					int r = rand.nextInt(128);
+					int g = rand.nextInt(128) + 128;
+					int b = rand.nextInt(128);
+					Color green = Color.rgb(r, g, b);						
+					Rectangle confetti = new Rectangle(5, 5, green);
 
+					//gray
+//					int rgb = rand.nextInt(256);
+//					Color gray = Color.rgb(rgb, rgb, rgb);						
+//					Rectangle confetti = new Rectangle(5, 5, gray);					
+					
 					//make confetti
-					Rectangle confetti = new Rectangle(5, 5, rainbow);
+//					Rectangle confetti = new Rectangle(5, 5, rainbow);
 					confetti.relocate(mouseX, mouseY);
 					canvas.getChildren().add(confetti);	
 					
@@ -93,16 +133,25 @@ public class Confetti extends Application {
 					explode.play();
 					//move pinata
 					pinata.relocate(rand.nextInt(MaxX), rand.nextInt(MaxY));
+
 					}
 					//update score
 				pressCount++;
 				canvas.getChildren().remove(score);
 				score.setText("" + pressCount);
 				score.setFill(Color.SNOW);
-				canvas.getChildren().add(score);
+				canvas.getChildren().add(score);  			
+				}
+			//update score if no hit
+			if(hit==false) {
+				pressCount--;
+				canvas.getChildren().remove(score);
+				score.setText("" + pressCount);
+				score.setFill(Color.SNOW);
+				canvas.getChildren().add(score);  			
 				}
 			}
-		});
+	    });
 	}
 	   
 	public void handle(MouseEvent mouseEvent) {
@@ -113,4 +162,5 @@ public class Confetti extends Application {
 	public static void main(String[] args) {
 		launch();
 	}
+	
 }
